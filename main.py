@@ -26,14 +26,18 @@ def code_type(filename: str) -> str | None:
                 return "Java"
             case "py":
                 return "Python"
+            case "jsx":
+                return "jsx"
+            case "pddl":
+                return "pddl"
 
 
 def prompt(
-    filename: str,
-    contents: str,
-    pr_description: str,
-    comments: List[str],
-    readme: str,
+        filename: str,
+        contents: str,
+        pr_description: str,
+        comments: List[str],
+        readme: str,
 ) -> str:
     code = "code"
     type = code_type(filename)
@@ -41,11 +45,11 @@ def prompt(
         code = f"{type} {code}"
 
     additional_context = (
-        f"PR Description (provides intent and high-level overview):\n{pr_description}\n\n"
-        + "PR Comments (feedback and discussions from team members):\n"
-        + "\n".join(comments)
-        + "\n\nREADME (project overview and setup instructions):\n"
-        + f"{readme}\n\n"
+            f"PR Description (provides intent and high-level overview):\n{pr_description}\n\n"
+            + "PR Comments (feedback and discussions from team members):\n"
+            + "\n".join(comments)
+            + "\n\nREADME (project overview and setup instructions):\n"
+            + f"{readme}\n\n"
     )
 
     return (
@@ -79,13 +83,13 @@ def prompt(
 
 
 def fetch_contextual_info(
-    pull: PullRequest.PullRequest, repo
+        pull: PullRequest.PullRequest, repo
 ) -> Tuple[str, List[str], str]:
     pr_description = pull.body or "No description provided."
     comments = [
         comment.body
         for comment in list(pull.get_issue_comments())
-        + list(pull.get_review_comments())
+                       + list(pull.get_review_comments())
         if not comment.user.type == "Bot"
     ]
     # Try to fetch README file content, considering different common casings
@@ -107,7 +111,7 @@ def is_merge_commit(commit: Commit.Commit) -> bool:
 
 
 def files_for_review(
-    pull: PullRequest.PullRequest, patterns: List[str]
+        pull: PullRequest.PullRequest, patterns: List[str]
 ) -> Iterable[Tuple[str, Commit.Commit, str]]:
     changes = {}
     commits = pull.get_commits()
@@ -140,7 +144,7 @@ def files_for_review(
                 continue
 
             if any(
-                fnmatch(file.filename.strip(), pattern.strip()) for pattern in patterns
+                    fnmatch(file.filename.strip(), pattern.strip()) for pattern in patterns
             ):
                 changes[file.filename] = {
                     "sha": commit.sha,
@@ -152,14 +156,14 @@ def files_for_review(
 
 
 def review(
-    filename: str,
-    content: str,
-    model: str,
-    temperature: float,
-    max_tokens: int,
-    pr_description: str,
-    comments: List[str],
-    readme: str,
+        filename: str,
+        content: str,
+        model: str,
+        temperature: float,
+        max_tokens: int,
+        pr_description: str,
+        comments: List[str],
+        readme: str,
 ) -> str:
     x = 0
     while True:
@@ -205,14 +209,14 @@ def main():
         "--openai_model",
         default="gpt-3.5-turbo",
         help="GPT-3 model to use. Options: gpt-3.5-turbo, text-davinci-002, "
-        "text-babbage-001, text-curie-001, text-ada-001. Recommended: gpt-3.5-turbo",
+             "text-babbage-001, text-curie-001, text-ada-001. Recommended: gpt-3.5-turbo",
     )
     parser.add_argument(
         "--openai_temperature",
         default=0.5,
         type=float,
         help="Sampling temperature to use, a float [0, 1]. Higher values "
-        "mean the model will take more risks. Recommended: 0.5",
+             "mean the model will take more risks. Recommended: 0.5",
     )
     parser.add_argument(
         "--openai_max_tokens",
