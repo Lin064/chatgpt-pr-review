@@ -11,7 +11,7 @@ from github import Github, PullRequest, Commit
 OPENAI_BACKOFF_SECONDS = 20  # 3 requests per minute
 OPENAI_MAX_RETRIES = 3
 
-MAX_FILES_ALLOWED_FOR_REVIEW = 10
+MAX_FILES_ALLOWED_FOR_REVIEW = 20
 
 
 def code_type(filename: str) -> str | None:
